@@ -1,20 +1,33 @@
-package Exemples;
-
+/**
+ * Démonstration d'utilisation de tableaux multidimensionnels (2D arrays).
+ *
+ * <p>
+ * Affiche des exemples simples de concaténation de chaînes, d'affichage d'une
+ * matrice
+ * d'entiers et d'un emploi du temps. Utilise la classe utilitaire {@code IO}
+ * pour l'affichage.
+ * </p>
+ */
 public class MultiDimArrayDemo {
+    /**
+     * Point d'entrée de la démonstration.
+     *
+     * @param args arguments de la ligne de commande (non utilisés)
+     */
     public static void main(String[] args) {
         String[][] names = {
                 { "Mr. ", "Mrs. ", "Ms. " },
                 { "Smith", "Jones" }
         };
 
-        System.out.println(names[0][0]);
-        System.out.println(names[1][0]);
-        System.out.println(names[0][2]);
-        System.out.println(names[1][1]);
+        IO.println(names[0][0]);
+        IO.println(names[1][0]);
+        IO.println(names[0][2]);
+        IO.println(names[1][1]);
         // Mr. Smith
-        System.out.println(names[0][0] + names[1][0]);
+        IO.println(names[0][0] + names[1][0]);
         // Ms. Jones
-        System.out.println(names[0][2] + names[1][1]);
+        IO.println(names[0][2] + names[1][1]);
 
         // Multidimensional arrays (2D array)
         int[][] matrix = {
