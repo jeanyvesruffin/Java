@@ -6,9 +6,9 @@
 - [Installation](#installation)
 - [Compilation](#compilation)
 - [Record](#record)
-    - [Type de record d'identification](#type-de-record-didentification)
-    - [Informations sur les composants](#informations-sur-les-composants)
-    - [Accès aux champs record](#acces-aux-champs-record)
+  - [Type de record d'identification](#type-de-record-didentification)
+  - [Informations sur les composants](#informations-sur-les-composants)
+  - [Accès aux champs record](#accès-aux-champs-record)
 
 ## Ressources
 
