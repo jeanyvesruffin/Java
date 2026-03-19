@@ -75,7 +75,7 @@ Ces deux éléments ont un impact sur l'API de réflexion.
 
 ### Type de record d'identification
 
-Lors de l'introduction des records dans Java SE 16, plusieurs nouvelles méthodes et classes ont été ajoutées à l'API de réflexion. Parmi elles figure une méthode **Class** permettant de vérifier si une classe donnée est une classe de record **Class.isRecord()**.
+Lors de l'introduction des records dans Java SE 16, plusieurs nouvelles méthodes et classes ont été ajoutées à l'API de réflexion. Parmi elles figure une méthode `Class` permettant de vérifier si une classe donnée est une classe de record `Class.isRecord()`.
 
 Supposons que vous ayez le record suivant.
 
@@ -102,17 +102,17 @@ Testez par vous même [Type de record d'identification](Records.java)
 
 ### Informations sur les composants
 
-Les records définissent également un nouvel élément pour le langage Java : **record component**. Un composant de records est l’un des éléments déclarés lors de la déclaration d’un record. L’API de réflexion prend également en charge cette notion de composant de record.
+Les records définissent également un nouvel élément pour le langage Java : `record component`. Un composant de records est l’un des éléments déclarés lors de la déclaration d’un record. L’API de réflexion prend également en charge cette notion de composant de record.
 
-L'API Reflection introduit une nouvelle classe **RecordComponent** qui modélise un composant d'un record. Cette classe comporte plusieurs méthodes.
+L'API Reflection introduit une nouvelle classe `RecordComponent` qui modélise un composant d'un record. Cette classe comporte plusieurs méthodes.
 
 | Component API | Comments |
 | :--- | :--- |
-| **getDeclaringRecord()** | Returns the class that declares this component |
-| **getAccessor()** | Returns the method that models the accessor of this component |
-| **getName()** | Returns the name of this component. |
-| **getType()** | Returns the type of this component, as a Class object. |
-| **getGenericType()** | Returns the generic type of this component, as a Type object. |
+| `getDeclaringRecord()` | Returns the class that declares this component |
+| `getAccessor()` | Returns the method that models the accessor of this component |
+| `getName()` | Returns the name of this component. |
+| `getType()` | Returns the type of this component, as a Class object. |
+| `getGenericType()` | Returns the generic type of this component, as a Type object. |
 
 Voyons ces méthodes en action.
 
@@ -153,7 +153,7 @@ genericSignature = null
 
 ### Accès aux champs record
 
-Notez qu'il n'existe aucune méthode dans cette RecordComponent classe permettant d'obtenir une référence à l'objet **Field** qui modélise le champ de ce composant.
+Notez qu'il n'existe aucune méthode dans cette RecordComponent classe permettant d'obtenir une référence à l'objet `Field` qui modélise le champ de ce composant.
 
 Vous pouvez toujours obtenir une référence aux Field record à l'aide de cette Class.getDeclaredFields()méthode. Cependant, vous ne pouvez pas modifier le champ d'un record, même en appelant cette méthode Field.setAccessible(true). Ce comportement est spécifique aux records.
 
@@ -220,3 +220,113 @@ Exception in thread "main" java.lang.IllegalAccessException: Can not set final i
     at java.base/java.lang.reflect.Field.setInt(Field.java:1031)
     at org.devjava.Main.main(Main.java:25)
 ```
+
+## Generics
+
+### Pourquoi utiliser les générics
+
+En résumé, les génériques permettent d'utiliser des types (classes et interfaces) comme paramètres lors de la définition de classes, d'interfaces et de méthodes. À l'instar des paramètres formels plus courants utilisés dans les déclarations de méthodes, les paramètres de type permettent de réutiliser le même code avec des entrées différentes. La différence réside dans le fait que les entrées des paramètres formels sont des valeurs, tandis que celles des paramètres de type sont des types.
+Le code utilisant des génériques présente de nombreux avantages par rapport au code non générique:
+
+- Contrôles de type plus stricts à la compilation. Un compilateur Java applique un contrôle de type strict au code générique et signale des erreurs si le code enfreint les règles de sécurité des types. Corriger les erreurs de compilation est plus simple que de corriger les erreurs d'exécution, qui peuvent être difficiles à détecter.
+- Suppression des conversions de type. L'extrait de code suivant, sans génériques, nécessite une conversion de type.
+
+```java
+List list = new ArrayList();
+list.add("hello");
+String s = (String) list.get(0);
+```
+
+Une fois réécrit pour utiliser les génériques, le code ne nécessite plus de conversion de type :
+
+```java
+List<String> list = new ArrayList<String>();
+list.add("hello");
+String s = list.get(0);   // no cast
+```
+
+- Permettre aux programmeurs d'implémenter des algorithmes génériques. Grâce aux génériques, les programmeurs peuvent implémenter des algorithmes génériques qui fonctionnent sur des collections de types différents, sont personnalisables, sûrs au niveau des types et plus faciles à lire.
+
+### Types génériques (Exemple)
+
+Un type générique est une classe ou une interface générique paramétrée par des types. La classe `Box` suivante sera modifiée pour illustrer ce concept.
+
+```java
+public class Box {
+    private Object object;
+
+    public void set(Object object) { this.object = object; }
+    public Object get() { return object; }
+}
+```
+
+Puisque ses méthodes acceptent ou renvoient un Object `String` , vous pouvez lui passer n'importe quel type, à condition qu'il ne s'agisse pas d'un type primitif. Il est impossible de vérifier, à la compilation, comment la classe est utilisée. Une partie du code peut placer un `String Integer` dans la boîte et s'attendre à en obtenir des objets de type `IntegerString`, tandis qu'une autre partie du code peut lui passer par erreur un `String String`, ce qui entraînera une erreur d'exécution.
+
+Une classe générique est définie selon le format suivant :
+
+```java
+class name<T1, T2, ..., Tn> { /* ... */ }
+```
+
+La section des paramètres de type, délimitée par des chevrons (<>), suit le nom de la classe. Elle spécifie les paramètres de type (également appelés `variables de type`) T1, T2, ..., et Tn.
+
+Pour mettre à jour la classe Box afin qu'elle utilise les génériques, vous créez une déclaration de type générique en remplaçant le code «public class Box  » par «public class Box `<T>` ». Cela introduit la variable de type, T, qui peut être utilisée n'importe où dans la classe.
+
+Avec cette modification, la Boxclasse devient :
+
+```java
+/**
+ * Generic version of the Box class.
+ * @param <T> the type of the value being boxed
+ */
+public class Box<T> {
+    // T stands for "Type"
+    private T t;
+
+    public void set(T t) { this.t = t; }
+    public T get() { return t; }
+}
+```
+
+Comme vous pouvez le constater, toutes les occurrences de Object sont remplacées par T. Une variable de type peut être n'importe quel type non primitif que vous spécifiez : n'importe quel type de classe, n'importe quel type d'interface, n'importe quel type de tableau, ou même une autre variable de type.
+
+Cette même technique peut être appliquée pour créer des interfaces génériques.
+
+### Convention de nommage
+
+| Syntaxe | Description |
+| :--- | :--- |
+| **E** | Élément (largement utilisé par le framework Java Collections) |
+| **K** | Clé |
+| **N** | Nombre |
+| **T** | Type |
+| **V** | Valeur |
+| **S, U, V etc.** | 2e, 3e, 4e types |
+
+### Invocation et instanciation d'un type générique
+
+Pour faire référence à la classe générique `Box` depuis votre code, vous devez effectuer un appel de type générique, qui remplace T par une valeur concrète, telle que `Integer` :
+
+```java
+Box<Integer> integerBox;
+```
+
+On peut considérer un appel de type générique comme similaire à un appel de méthode ordinaire, mais au lieu de passer un argument à une méthode, on passe un argument de type — Integer dans ce cas — à la classe Box elle-même.
+
+Pour instancier cette classe, utilisez le mot-clé `new`, comme d'habitude, mais placez-le `<Integer>` entre le nom de la classe et la parenthèse :
+
+```java
+Box<Integer> integerBox = new Box<Integer>();
+```
+
+### Diamond
+
+Vous pouvez remplacer les arguments de type requis pour appeler le constructeur d'une classe générique par un ensemble vide d'arguments de type ( <>) à condition que le compilateur puisse déterminer, ou inférer, les arguments de type à partir du contexte. Cette paire de chevrons, <>, est communément appelée le `diamond`. Par exemple, vous pouvez créer une instance de Box `<Integer>` avec l'instruction suivante :
+
+```java
+Box<Integer> integerBox = new Box<>();
+```
+
+### Methode, parametre de type, héritage de generic
+
+[Voir documentation officiel pour plus d'information](https://dev.java/learn/generics/intro/#why-using-generics)
